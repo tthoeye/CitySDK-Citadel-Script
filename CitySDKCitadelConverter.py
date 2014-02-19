@@ -1,6 +1,7 @@
 import urllib2
 import cookielib
 import json
+import vobject
 
 #CONFIGURATION
 LANG = "pt-PT"
@@ -104,20 +105,36 @@ for i in decoded_data['poi']:
     pos.posList = ""
     
     address = Object()
-    address.value = ""
-    address.postal = ""
+   
     address.city = CITY
 
+    telText = ""
+    mailText = ""
+    urlText = ""
+    addressText = ""
+    postalText = ""
     if 'location' in i:
         if 'point' in i['location']:
             for j in i['location']['point']:
                 pos.posList = j['Point']['posList']
-        #if 'address' in i['location']:
-            #if 'type' in i['location']['address']:
-                #if i['location']['address']['type'] == "text/vcard":
-                    #address.value = i['location']['address']['value']
-                    #address.postal =  i['location']['address']['value']
-                
+        if 'address' in i['location']:
+            if 'type' in i['location']['address']:
+                if i['location']['address']['type'] == "text/vcard":
+
+                    try:
+                        vobj=vobject.readOne( i['location']['address']['value'])
+                        mylist = vobj.adr.value.split(";")
+                        telText = vobj.tel.value
+                        urlText = vobj.url.value
+                        mailText = vobj.email.value
+                        addressText = mylist[1]
+                        postalText = mylist[5]
+                    except: 
+                        pass
+        
+    address.value = addressText
+    address.postal = postalText        
+
     point = Object()
     point.term = "centroid"
     point.pos = pos
@@ -128,19 +145,19 @@ for i in decoded_data['poi']:
     tel = Object()
     tel.term = "telephone"
     tel.type = "tel"
-    tel.text = ""
+    tel.text = telText
     tel.tplIdentifier = "#Citadel_telephone"
     
     mail = Object()
     mail.term = "email"
     mail.type = "mail"
-    mail.text = ""
+    mail.text = mailText
     mail.tplIdentifier = "#Citadel_email"
 
     url = Object()
     url.term = "website"
     url.type = "url"
-    url.text = ""
+    url.text = urlText
     url.tplIdentifier = "Citadel_website"
  
     me.attribute = []
