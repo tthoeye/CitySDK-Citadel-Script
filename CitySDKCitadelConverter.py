@@ -2,15 +2,23 @@ import urllib2
 import cookielib
 import json
 
-class Object:
-    def to_JSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-
+#CONFIGURATION
 LANG = "pt-PT"
 CITY = "Lisboa"
+LINKINFO = "http://tourism.citysdk.cm-lisboa.pt/resources"
+SITE = "http://tourism.citysdk.cm-lisboa.pt/pois/search?limit=-1"
+UPDATEDDATE = "20121128T09:38:21-5:00"
+CREATEDDATE = "20121128T09:38:21-5:00"
+UPDATEFREQUENCY = "semester"
+AUTHOR = "CitySDK"
+LICENSE = "GNU GPL"
+LICENSEURL = "http://www.gnu.org/licenses/gpl.html"
+OUTPUTFILE = "POI_lisbon.json"
 
-site= "http://tourism.citysdk.cm-lisboa.pt/pois/search?limit=-1"
-
+class Object:
+    def to_JSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4, ensure_ascii=False).encode('utf8')
+ 
 hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
@@ -18,7 +26,7 @@ hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML,
        'Accept-Language': 'en-US,en;q=0.8',
        'Connection': 'keep-alive'}
 
-req = urllib2.Request(site, headers=hdr)
+req = urllib2.Request(SITE, headers=hdr)
 
 try:
     page = urllib2.urlopen(req)
@@ -30,24 +38,24 @@ decoded_data = json.loads(content)
 
 dataset = Object()
 general = Object()
-general.id = "http://tourism.citysdk.cm-lisboa.pt/resources"
-general.updated = "20121128T09:38:21-5:00"
-general.created = "20121128T09:38:21-5:00"
+general.id = LINKINFO
+general.updated = CREATEDDATE
+general.created = UPDATEDDATE
 general.lang = LANG
-general.updatefrequency = "semester"
+general.updatefrequency = UPDATEFREQUENCY
 
 author = Object()
-author.id = "http://tourism.citysdk.cm-lisboa.pt/resources"
-author.value = "CitySDK"
+author.id = LINKINFO
+author.value = AUTHOR
 general.author = author
 
 license = Object()
-license.href = "http://www.gnu.org/licenses/gpl.html"
-license.term = "GNU GPL"
+license.href = LICENSEURL
+license.term = LICENSE
 general.license = license
 
 link = Object()
-link.href = "http://tourism.citysdk.cm-lisboa.pt/resources"
+link.href = LINKINFO
 link.term = "source"
 general.link = link
 
@@ -144,5 +152,6 @@ for i in decoded_data['poi']:
     
 dataset.dataset = general
 
-f = open('POI_lisbon.json', 'w')
+f = open(OUTPUTFILE, "w")
 f.write(dataset.to_JSON())
+f.close()
