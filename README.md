@@ -14,5 +14,6 @@ Setup
 
 Run
 --------------
-
+    $ source CitySDK-Citadel-Script/bin/activate
+    $ cd CitySDK-Citadel-Script/
     $ python CitySDKCitadelConverter.py 
