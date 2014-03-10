@@ -6,15 +6,17 @@ import vobject
 #CONFIGURATION
 LANG = "pt-PT"
 CITY = "Lisboa"
-LINKINFO = "http://tourism.citysdk.cm-lisboa.pt/resources"
 SITE = "http://tourism.citysdk.cm-lisboa.pt/pois/search?limit=-1"
+OUTPUTFILE = "POI_lisboa.json"
+
+LINKINFO = "http://tourism.citysdk.cm-lisboa.pt/resources"
 UPDATEDDATE = "20121128T09:38:21-5:00"
 CREATEDDATE = "20121128T09:38:21-5:00"
 UPDATEFREQUENCY = "semester"
 AUTHOR = "CitySDK"
 LICENSE = "GNU GPL"
 LICENSEURL = "http://www.gnu.org/licenses/gpl.html"
-OUTPUTFILE = "POI_lisbon.json"
+
 
 class Object:
     def to_JSON(self):
@@ -67,16 +69,16 @@ for i in decoded_data['poi']:
     me.id = i['id']
 
     me.title = ""
-   
     if 'label' in i:
         for j in i['label']:
             if 'lang' in j:
                 if j['lang'] == LANG:
                     me.title = j['value']
-            elif 'lang' in i:
-                if i['lang'] == LANG:
-                    me.title = j['value']
-
+                elif 'lang' in i:
+                    if i['lang']  == j['lang']:
+                        me.title = j['value']
+            else:
+                me.title = j['value']
 
     me.description = ""
     if 'description' in i:
@@ -84,9 +86,11 @@ for i in decoded_data['poi']:
            if 'lang' in j:
                 if j['lang'] == LANG:
                     me.description = j['value']
-           elif 'lang' in i:
-                if i['lang'] == LANG:
-                    me.description = j['value']
+                elif 'lang' in i:
+                    if i['lang'] == j['lang']:
+                        me.description = j['value']
+           else:
+                me.description = j['value']           
 
     me.category = []
     if 'category' in i:
@@ -94,9 +98,11 @@ for i in decoded_data['poi']:
             if 'lang' in j:
                 if j['lang'] == LANG:
                     me.category.append(j['value'])
-            elif 'lang' in i:
-                if i['lang'] == LANG:
-                    me.category.append(j['value'])
+                elif 'lang' in i:
+                    if i['lang']  == j['lang']:
+                        me.category.append(j['value'])
+            else:
+                me.category.append(j['value'])
 
     me.location = Object()
     
